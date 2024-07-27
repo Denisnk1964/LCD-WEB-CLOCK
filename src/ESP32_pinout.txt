@@ -1,0 +1,154 @@
+SP32 Pinout notes:
+
+What is superflous or can be on the carrier PCB and doesn't require pass-through to the header?
+---------------------------------------------------------------------------------------------
+After some thinking and logically grouping things...
+Desired order of 26 pin header:
+pin 1 -Y GND - Ground
+pin 6 ?Y GPIO-34 - ADC6/RTC_GPIO4 (RTC_WAKEUP)
+pin 7 ?Y GPIO-35 - ADC7/RTC_GPIO5 (RTC_WAKEUP) (FTDI CTS unless there's a better pin?)
+pin25 -Y GPIO-00 - ADC11/Touch1/BOOT/EMAC_TX_CLK/RMII_CLK_OUT (default pullup)
+pin 2 -Y 3v3 - Main Power input
+pin26 -- GPIO-04 - ADC10/Touch0 (default pulldown)
+pin34 -Y GPIO-03 - UART0_RXD0
+pin12 ?Y GPIO-27 - ADC17/Touch7/RTC_GPIO17/RMII_CRS_DV
+pin35 -Y GPIO-01 - UART0_TXD0
+pin33 -Y GPIO-21 - I2C SCL / RMII_TX_EN
+pin 3 ?? Enable/Reset - Pulled low with a 12k resistor (default pullup) (DTR/RTS reset circuit)
+pin36 -Y GPIO-22 - I2C SDA / RMII_TXD[1]
+
+Stop here for a basic 12 pin module with wakeup, i2c, and ftdi-style 6-pin inline serial.
+FTDI style is: GND, CTS, VCC, TXD, RXD, RTS
+
+pin37 -Y GPIO-23 - VSPI MOSI
+pin31 -Y GPIO-19 - VSPI MISO / RMII_TXD[0]
+pin30 -Y GPIO-18 - VSPI SCK (SPI Clock)
+pin29 -Y GPIO-05 - VSPI SS (default pullup)
+Stop here for a basic 16 pin module with SPI.
+
+pin10 ?Y GPIO-25 - ADC18/DAC1_AUDIO/RTC_GPIO6/RMII_RXD[0]
+pin11 ?Y GPIO-26 - ADC19/DAC2_AUDIO/RTC_GPIO7/RMII_RXD[1]
+Stop here for a 18 pin module with two additional 8bit DAC outputs.
+
+pin28 -Y GPIO-17 - UART2_TXD / RMII_INT_OSC_CLK_OUT_180
+pin27 -Y GPIO-16 - UART2_RXD / RMII_INT_OSC_CLK_OUT
+Stop here for a 20 pin module with a second serial port or full RMII ethernet.
+
+pin17 -Y GPIO-09 - FLASH/SDIO D2
+pin18 -Y GPIO-10 - FLASH/SDIO D3
+pin19 -Y GPIO-11 - FLASH/SDIO CMD
+pin20 -Y GPIO-06 - FLASH/SDIO SCK (SPI Clock)
+pin21 -Y GPIO-07 - FLASH/SDIO D0
+pin22 -Y GPIO-08 - FLASH/SDIO D1
+Stop here for a 26 pin module with SDIO.
+
+14+6 pins = 26 pins, These six are shared with the on-module SPI flash chip.
+Since they're optional, these will be 21-26, the six pins at the end of 26pin header.
+These last 6 will be skippable to get a 20 pin module pinout.
+
+Here it is again, in module pin order:
+---------------------------------------------------------------------------------------------
+Total Retained: 26 pins + JTAG header (HSPI)
+JTAG/HSPI Header + ground + 3.3v = 6 pin header:
+pin13 -N GPIO-14 - HSPI_SCK/ADC16/Touch6/JTAG_TMS (SPI clock) 
+pin14 -N GPIO-12 - HSPI_MISO/ADC15/Touch5/JTAG_TDI (default pulldown)
+pin16 -N GPIO-13 - HSPI_MOSI/ADC14/Touch4/JTAG_TCK (JTAG clock)
+pin23 -N GPIO-15 - HSPI_SS/ADC13/Touch3/JTAG_TDO (default pullup)
+pulldown on GPIO-15 to disable bootlog on UART_TXD0 (do not populate)
+pullup on GPIO-12 for 1.8V SDIO/IO (do not populate)
+
+software pullup after boot with dim Red SMT LED at:
+pin24 -N GPIO-02 - ADC12/Touch2 (default pulldown)
+
+Main header requires (In module pin order):
+pin 1 -Y GND - Ground
+pin 2 -Y 3v3 - Main Power input
+pin 3 ?? Enable/Reset - Pulled low with a 12k resistor (default pullup)
+pin 6 ?Y GPIO-34 - ADC6/RTC_GPIO4 (RTC_WAKEUP)
+pin 7 ?Y GPIO-35 - ADC7/RTC_GPIO5 (RTC_WAKEUP)
+pin10 ?Y GPIO-25 - ADC18/DAC1_AUDIO/RTC_GPIO6/RMII_RXD[0]
+pin11 ?Y GPIO-26 - ADC19/DAC2_AUDIO/RTC_GPIO7/RMII_RXD[1]
+pin12 ?Y GPIO-27 - ADC17/Touch7/RTC_GPIO17/RMII_CRS_DV
+8 pins, nothing more to gain here with the RTC_XTAL & ADC_PREAMP cap in place.
+
+pin17 -Y GPIO-09 - FLASH/SDIO D2
+pin18 -Y GPIO-10 - FLASH/SDIO D3
+pin19 -Y GPIO-11 - FLASH/SDIO CMD
+pin20 -Y GPIO-06 - FLASH/SDIO SCK (SPI Clock)
+pin21 -Y GPIO-07 - FLASH/SDIO D0
+pin22 -Y GPIO-08 - FLASH/SDIO D1
+8+6 pins = 14 pins, These six are shared with the on-module SPI flash chip.
+Since they're optional, these will be 21-26, the six pins at the end of 26pin header.
+These last 6 will be skippable to get a 20 pin module pinout.
+
+pin25 -Y GPIO-00 - ADC11/Touch1/BOOT/EMAC_TX_CLK/RMII_CLK_OUT (default pullup)
+pin26 -- GPIO-04 - ADC10/Touch0 (default pulldown)
+pin27 -Y GPIO-16 - UART2_RXD / RMII_INT_OSC_CLK_OUT
+pin28 -Y GPIO-17 - UART2_TXD / RMII_INT_OSC_CLK_OUT_180
+
+pin29 -Y GPIO-05 - VSPI SS (default pullup)
+pin30 -Y GPIO-18 - VSPI SCK (SPI Clock)
+pin31 -Y GPIO-19 - VSPI MISO / RMII_TXD[0]
+
+pin33 -Y GPIO-21 - I2C SCL / RMII_TX_EN
+pin34 -Y GPIO-03 - UART0_RXD0
+pin35 -Y GPIO-01 - UART0_TXD0
+pin36 -Y GPIO-22 - I2C SDA / RMII_TXD[1]
+
+pin37 -Y GPIO-23 - VSPI MOSI
+14 + 4 + 4 + 4 = 26 pins total.
+---------------------------------------------------------------------------------------------
+FULL PIN LIST:
+PINID,SUPERFLOUS,HOST_USES,COMMON_NAME,ALT_MODES,DESCRIPTION
+
+pin 1 -Y GND - Ground
+pin 2 -Y 3v3 - Main Power input
+pin 3 ?? Enable/Reset - Pulled low with a 12k resistor (default pullup)
+pin 4 XN GPIO-36 - SVP/RTC_GPIO0 - Positive side of Capacitor for ADC preamp
+pin 5 XN GPIO-39 - SVN/RTC_GPIO3 - Negative side of Capacitor for ADC preamp
+pin 6 ?Y GPIO-34 - ADC6/RTC_GPIO4 (RTC_WAKEUP)
+pin 7 ?Y GPIO-35 - ADC7/RTC_GPIO5 (RTC_WAKEUP)
+pin 8 XN GPIO-32 - ADC4/Touch9/RTC_GPIO9 - Positive side of RTC's 32khz crystal
+pin 9 XN GPIO-33 - ADC5/Touch8/RTC_GPIO8 - Negative side of RTC's 32khz crystal
+pin10 ?Y GPIO-25 - ADC18/DAC1_AUDIO/RTC_GPIO6/RMII_RXD[0]
+pin11 ?Y GPIO-26 - ADC19/DAC2_AUDIO/RTC_GPIO7/RMII_RXD[1]
+pin12 ?Y GPIO-27 - ADC17/Touch7/RTC_GPIO17/RMII_CRS_DV
+pin13 -N GPIO-14 - HSPI_SCK/ADC16/Touch6/JTAG_TMS (SPI clock) 
+pin14 -N GPIO-12 - HSPI_MISO/ADC15/Touch5/JTAG_TDI (default pulldown)
+pin15 XN GND - Ground
+pin16 -N GPIO-13 - HSPI_MOSI/ADC14/Touch4/JTAG_TCK (JTAG clock)
+pin17 -Y GPIO-09 - FLASH/SDIO D2
+pin18 -Y GPIO-10 - FLASH/SDIO D3
+pin19 -Y GPIO-11 - FLASH/SDIO CMD (huh?)
+pin20 -Y GPIO-06 - FLASH/SDIO SCK (SPI Clock)
+pin21 -Y GPIO-07 - FLASH/SDIO D0
+pin22 -Y GPIO-08 - FLASH/SDIO D1
+pin23 -N GPIO-15 - HSPI_SS/ADC13/Touch3/JTAG_TDO (default pullup)
+pin24 -N GPIO-02 - ADC12/Touch2 (default pulldown)
+pin25 -Y GPIO-00 - ADC11/Touch1/BOOT/EMAC_TX_CLK/RMII_CLK_OUT (default pullup)
+pin26 -- GPIO-04 - ADC10/Touch0 (default pulldown)
+pin27 -Y GPIO-16 - UART2_RXD / RMII_INT_OSC_CLK_OUT
+pin28 -Y GPIO-17 - UART2_TXD / RMII_INT_OSC_CLK_OUT_180
+pin29 -Y GPIO-05 - VSPI SS (default pullup)
+pin30 -Y GPIO-18 - VSPI SCK (SPI Clock)
+pin31 -Y GPIO-19 - VSPI MISO
+pin32 XN NC - devboard shows GND label?
+pin33 -Y GPIO-21 - I2C SCL / RMII_TX_EN
+pin34 -Y GPIO-03 - UART0_RXD0
+pin35 -Y GPIO-01 - UART0_TXD0
+pin36 -Y GPIO-22 - I2C SDA / RMII_TXD[1]
+pin37 -Y GPIO-23 - VSPI MOSI
+pin38 XN GND - Ground
+
+
+
+// Used
+/*
+//===========================
+GPIO-13 - TOUCH
+GPIO-14 - TOUCH
+GPIO-12 - TOUCH
+GPIO-15 - LCD 
+GPIO-21 - I2C SCL | LCD 20x4 | AHX10
+GPIO-22 - I2C SDA | LCD 20x4 | AHX10
+*/
